@@ -26,6 +26,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+// https://mvnrepository.com/artifact/org.postgresql/postgresql
+implementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
+
+// https://mvnrepository.com/artifact/org.springframework.data/spring-data-jpa
+implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.5.5'
+
 test {
 	useJUnitPlatform()
 }
