@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: update-usr
+      author: Anastasia
+      changes:
+        - addColumn:
+            tableName: app_user
+            columns:
+              - column:
+                  name: password
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
