@@ -1,0 +1,54 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-usr
+      author: Anastasia
+      changes:
+        - createTable:
+            tableName: app_user
+            columns:
+              - column:
+                  name: userId
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_name
+                  type: varchar(200)
+                  constraints:
+                   nullable: false
+              - column:
+                 name: mail
+                 type: varchar(200)
+                 constraints:
+                  nullable: false
+              - column:
+                  name: gender
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_app_user_gender
+                    references: gender(id)
+              - column:
+                 name: phone_number
+                 type: varchar(50)
+              - column:
+                 name: role
+                 type: bigint
+                 constraints:
+                   foreignKeyName: fk_app_user_role
+                   references: role(id)
+              - column:
+                 name: birth_date
+                 type: timestamp
+              - column:
+                 name: registered_time
+                 type: timestamp
+              - column:
+                 name: updated_time
+                 type: timestamp

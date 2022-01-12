@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/educationsystem
+    username: root
+    password: educationsystem
+    driver-class-name: org.postgresql.Driver
+
+logging:
+  pattern:
+    console: "${spring.application.name} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%X{X-B3-TraceId:-},%X{X-B3-SpanId:-}]){blue} [%thread] %clr(%level) %clr(%logger{36}){magenta} - %msg%n"
+  level:
+    ROOT: INFO
+    org.springframework: WARN
+    org.apache: WARN
+    org.hibernate: WARN
