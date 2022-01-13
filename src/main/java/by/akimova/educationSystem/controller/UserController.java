@@ -4,8 +4,15 @@ import by.akimova.educationSystem.exception.EntityNotFoundException;
 import by.akimova.educationSystem.exception.NotFreeUsernameException;
 import by.akimova.educationSystem.model.User;
 import by.akimova.educationSystem.service.UserService;
+import by.akimova.educationSystem.service.dto.UserDto;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,25 +30,33 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class UserController {
+
     private final UserService userService;
 
     /**
      * The method add new user.
      *
-     * @param user This is item with its information and body.
+     *  This is item with its information and body.
      * @return response with body of created user and status ok.
      */
-    @PostMapping
-    public ResponseEntity<?> addUser(@RequestBody User user) {
+
+    @ApiOperation (value = "Create user", notes = "Create user based on DTO object")
+    @ApiImplicitParam (name = "userDto", value = "userDto", required = true, dataType = "UserDto")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "User crated"),
+                    @ApiResponse(code = 400, message = "Bad request"),
+                    @ApiResponse(code = 500, message = "Something went wrong")
+            })
+    @PostMapping("/us")
+    public ResponseEntity<User> addUser(@RequestBody UserDto userDto) {
         User savedUser;
-        try {
-            savedUser = userService.save(user);
-        } catch (NotFreeUsernameException e) {
-            return new ResponseEntity<>("This username is already taken ", HttpStatus.BAD_REQUEST);
-        }
+
+        savedUser = userService.save(userDto);
+
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
@@ -51,7 +66,14 @@ public class UserController {
      * @return ResponseEntity with list of users and status ok.
      */
     @GetMapping
-    ResponseEntity<List<User>> getAllUsers() {
+    @ApiOperation (value = "Get list of users", notes = "Get list of users")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Getting all users"),
+                    @ApiResponse(code = 400, message = "Bad request"),
+                    @ApiResponse(code = 500, message = "Something went wrong")
+            })
+    public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -61,8 +83,16 @@ public class UserController {
      * @param id This is id of the person to be found.
      * @return ResponseEntity with found user and status ok.
      */
+    @ApiOperation(value = "Get information about user", notes = "Get information about user by id")
+    @ApiImplicitParam(name = "id", value = "User ID", required = true, dataType = "Long", paramType = "path")
+    @ApiResponses(
+            value = {
+                    @ApiResponse(code = 200, message = "Getting user"),
+                    @ApiResponse(code = 400, message = "Bad request"),
+                    @ApiResponse(code = 500, message = "Something went wrong")
+            })
     @GetMapping("/{id}")
-    ResponseEntity<?> getUserById(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<?> getUserById(@PathVariable(value = "id") Long id) {
         User user;
         try {
             user = userService.getById(id);

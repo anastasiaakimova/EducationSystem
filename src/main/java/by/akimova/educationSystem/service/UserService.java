@@ -3,6 +3,7 @@ package by.akimova.educationSystem.service;
 import by.akimova.educationSystem.exception.EntityNotFoundException;
 import by.akimova.educationSystem.exception.NotFreeUsernameException;
 import by.akimova.educationSystem.model.User;
+import by.akimova.educationSystem.service.dto.UserDto;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +18,7 @@ import java.util.Optional;
  ****************************************************************************************/
 
 public interface UserService {
-    User save(User user) throws NotFreeUsernameException;
+    User save(UserDto userDto) throws NotFreeUsernameException;
 
     User getById(Long id) throws EntityNotFoundException;
 

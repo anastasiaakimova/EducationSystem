@@ -5,9 +5,11 @@ import by.akimova.educationSystem.exception.NotFreeUsernameException;
 import by.akimova.educationSystem.model.User;
 import by.akimova.educationSystem.repository.UserRepo;
 import by.akimova.educationSystem.service.UserService;
+import by.akimova.educationSystem.service.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,25 +38,33 @@ public class UserServiceImpl implements UserService {
     /**
      * The method add new user.
      *
-     * @param user This is user with information about it, and it's fields
+     * @param userDto This is user with information about it, and it's fields
      * @return Saved user.
      */
-    public User save(User user) throws NotFreeUsernameException {
+
+    @Transactional()
+    public User save(UserDto userDto) throws NotFreeUsernameException {
         LocalDateTime today = LocalDateTime.now();
-        Optional mailUser = userRepo.findByMail(user.getMail());
+
+        var user = new User();
+
+        Optional mailUser = userRepo.findByMail(userDto.getMail());
         if (mailUser.isPresent()) {
             throw new NotFreeUsernameException("This username is already taken");
         }
-        user.setFirstName(user.getFirstName());
-        user.setLastName(user.getLastName());
-        user.setMail(user.getMail());
-        user.setBirthDate(user.getBirthDate());
-        user.setPassword(user.getPassword());
-        user.setGender(user.getGender());
-        user.setRole(user.getRole());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setMail(userDto.getMail());
+        user.setBirthDate(userDto.getBirthDate());
+        user.setPassword(userDto.getPassword());
+        user.setGender(userDto.getGender());
+        user.setPhoneNumber(userDto.getPhoneNumber());
+        user.setRole(userDto.getRole());
         user.setRegisteredTime(today);
         user.setUpdatedTime(today);
+
         log.info("IN saveUser - new user with id: {} successfully added", user.getId());
+
         userRepo.save(user);
         return user;
     }
