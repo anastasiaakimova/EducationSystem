@@ -4,12 +4,27 @@ spring:
     username: root
     password: educationsystem
     driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    database: postgresql
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+    deserialization:
+      fail-on-unknown-properties: false
+  liquibase:
+    enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
 
 logging:
   pattern:
     console: "${spring.application.name} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%X{X-B3-TraceId:-},%X{X-B3-SpanId:-}]){blue} [%thread] %clr(%level) %clr(%logger{36}){magenta} - %msg%n"
   level:
-    ROOT: INFO
-    org.springframework: WARN
+    ROOT: DEBUG
+    org.springframework: DEBUG
     org.apache: WARN
     org.hibernate: WARN
+
