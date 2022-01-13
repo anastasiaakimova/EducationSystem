@@ -2,13 +2,12 @@ package by.akimova.educationSystem.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 /*****************************************************************************************
+ * It is a model of a simple user.
+ *
  * @author Akimova Anastasia
  * @version 1.0
  *
@@ -17,9 +16,11 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "app_user")
+@Table(name = "app_user", schema = "public")
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @Column(name = "first_name", length = 200, nullable = false)
     private String firstName;
@@ -30,10 +31,12 @@ public class User {
     @Column(name = "password", length = 50, nullable = false)
     private String password;
     @Column(name = "gender")
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     @Column(name = "phone_number", length = 50)
     private String phoneNumber;
     @Column(name = "role")
+    @Enumerated(EnumType.STRING)
     private Role role;
     @Column(name = "birth_date")
     private LocalDateTime birthDate;
