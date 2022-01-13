@@ -7,7 +7,7 @@ databaseChangeLog:
             tableName: app_user
             columns:
               - column:
-                  name: userId
+                  name: id
                   type: bigint
                   autoIncrement: true
                   constraints:
@@ -29,20 +29,19 @@ databaseChangeLog:
                  constraints:
                   nullable: false
               - column:
-                  name: gender
-                  type: bigint
+                  name: password
+                  type: varchar(50)
                   constraints:
-                    foreignKeyName: fk_app_user_gender
-                    references: gender(id)
+                    nullable: false
+              - column:
+                  name: gender
+                  type: varchar(50)
               - column:
                  name: phone_number
                  type: varchar(50)
               - column:
                  name: role
-                 type: bigint
-                 constraints:
-                   foreignKeyName: fk_app_user_role
-                   references: role(id)
+                 type: varchar(50)
               - column:
                  name: birth_date
                  type: timestamp
