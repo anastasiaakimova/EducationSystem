@@ -24,7 +24,7 @@ public interface UserService {
 
     List<User> getAllUsers();
 
-    User updateUser(Long id, User user) throws EntityNotFoundException;
+    User updateUser(Long id, UserDto user) throws EntityNotFoundException;
 
     void deleteUserById(Long id);
 

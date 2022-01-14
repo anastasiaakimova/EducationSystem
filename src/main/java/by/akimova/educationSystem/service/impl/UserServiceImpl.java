@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -102,12 +101,13 @@ public class UserServiceImpl implements UserService {
     /**
      * This method update user.
      *
-     * @param id   This is user's id which needed to update.
-     * @param user This is updated user.
+     * @param id      This is user's id which needed to update.
+     * @param userDto This is updated user.
      * @return Updated user.
      */
     @Override
-    public User updateUser(Long id, User user) throws EntityNotFoundException {
+    @Transactional()
+    public User updateUser(Long id, UserDto userDto) throws EntityNotFoundException {
         LocalDateTime today = LocalDateTime.now();
 
         User dbUser = userRepo.findUserById(id);
@@ -115,12 +115,13 @@ public class UserServiceImpl implements UserService {
             log.error("IN updateUser - user not found by id {}", id);
             throw new EntityNotFoundException("user not found");
         }
-        dbUser.setFirstName(user.getFirstName());
-        dbUser.setLastName(user.getLastName());
-        dbUser.setMail(user.getMail());
-        dbUser.setPhoneNumber(user.getPhoneNumber());
-        dbUser.setRole(user.getRole());
-        dbUser.setGender(user.getGender());
+        dbUser.setFirstName(userDto.getFirstName());
+        dbUser.setLastName(userDto.getLastName());
+        dbUser.setMail(userDto.getMail());
+        dbUser.setPassword(userDto.getPassword());
+        dbUser.setPhoneNumber(userDto.getPhoneNumber());
+        dbUser.setRole(userDto.getRole());
+        dbUser.setGender(userDto.getGender());
         dbUser.setUpdatedTime(today);
 
         log.info("IN updateUser - user with id: {} successfully edited ", id);
@@ -134,6 +135,7 @@ public class UserServiceImpl implements UserService {
      * @param id This is user's id which needed to delete.
      */
     @Override
+    @Transactional()
     public void deleteUserById(Long id) {
         userRepo.deleteUserById(id);
         log.info("IN deleteUserById - user with id: {} successfully deleted", id);

@@ -23,8 +23,9 @@ logging:
   pattern:
     console: "${spring.application.name} %clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%X{X-B3-TraceId:-},%X{X-B3-SpanId:-}]){blue} [%thread] %clr(%level) %clr(%logger{36}){magenta} - %msg%n"
   level:
-    ROOT: WARN
-    org.springframework: WARN
+    ROOT: DEBUG
+    org.springframework: DEBUG
     org.apache: WARN
     org.hibernate: WARN
+
 
