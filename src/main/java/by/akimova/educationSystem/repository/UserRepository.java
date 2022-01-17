@@ -1,6 +1,7 @@
 package by.akimova.educationSystem.repository;
 
 import by.akimova.educationSystem.model.User;
+import by.akimova.educationSystem.service.dto.UserDto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,10 +17,6 @@ import java.util.Optional;
  ****************************************************************************************/
 
 @Repository("userRepository")
-public interface UserRepo extends JpaRepository<User, String> {
-    void deleteUserById(Long id);
-
+public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByMail(String mail);
-
-    User findUserById(Long id);
 }
