@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * Copyright (c) 2022.
  ****************************************************************************************/
 @ResponseStatus(HttpStatus.BAD_REQUEST)
-public class EntityNotFoundException extends Exception {
+public class EntityNotFoundException extends RuntimeException {
 
     public EntityNotFoundException() {
         super("user not found");
