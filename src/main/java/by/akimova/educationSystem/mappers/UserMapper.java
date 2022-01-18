@@ -13,14 +13,17 @@ import java.util.List;
  *
  * Copyright (c) 2022.
  ****************************************************************************************/
-@Mapper
+@Mapper(componentModel = "spring")
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     UserDto mapToDto(User user);
 
+    User mapToEntity(UserDto userDto);
+
     List<UserDto> mapToListDto(List<User> users);
 
-    User mapToEntity(UserDto userDto);
+    List<User> mapDtoToEntityList(List<UserDto> users);
+
 }
