@@ -2,8 +2,8 @@ package by.akimova.educationSystem.service.impl;
 
 import by.akimova.educationSystem.exception.EntityNotFoundException;
 import by.akimova.educationSystem.exception.NotFreeUsernameException;
-import by.akimova.educationSystem.model.User;
-import by.akimova.educationSystem.repository.UserRepo;
+import by.akimova.educationSystem.mappers.UserMapper;
+import by.akimova.educationSystem.repository.UserRepository;
 import by.akimova.educationSystem.service.UserService;
 import by.akimova.educationSystem.service.dto.UserDto;
 import lombok.AllArgsConstructor;
@@ -13,12 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /*****************************************************************************************
  * The class is implementation of user's business logic.
  * The class is implementation of  {@link UserService} interface.
- * Wrapper for {@link UserRepo} + business logic.
+ * Wrapper for {@link UserRepository} + business logic.
  *
  * @author Akimova Anastasia
  * @version 1.0
@@ -31,8 +30,10 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private final UserRepo userRepo;
-    //private final BCryptPasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+
+    private final UserMapper userMapper;
+
 
     /**
      * The method add new user.
@@ -40,32 +41,29 @@ public class UserServiceImpl implements UserService {
      * @param userDto This is user with information about it, and it's fields
      * @return Saved user.
      */
-
     @Transactional()
-    public User save(UserDto userDto) throws NotFreeUsernameException {
-        LocalDateTime today = LocalDateTime.now();
+    public UserDto save(UserDto userDto) throws NotFreeUsernameException {
+        var today = LocalDateTime.now();
 
-        var user = new User();
+        var mailUser = userRepository.findByMail(userDto.getMail())
+                .orElseThrow(
+                        () -> new NotFreeUsernameException("This username is already taken"));
 
-        Optional mailUser = userRepo.findByMail(userDto.getMail());
-        if (mailUser.isPresent()) {
-            throw new NotFreeUsernameException("This username is already taken");
-        }
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setMail(userDto.getMail());
-        user.setBirthDate(userDto.getBirthDate());
-        user.setPassword(userDto.getPassword());
-        user.setGender(userDto.getGender());
-        user.setPhoneNumber(userDto.getPhoneNumber());
-        user.setRole(userDto.getRole());
-        user.setRegisteredTime(today);
-        user.setUpdatedTime(today);
+        userDto.setFirstName(userDto.getFirstName());
+        userDto.setLastName(userDto.getLastName());
+        userDto.setMail(userDto.getMail());
+        userDto.setBirthDate(userDto.getBirthDate());
+        userDto.setPassword(userDto.getPassword());
+        userDto.setGender(userDto.getGender());
+        userDto.setPhoneNumber(userDto.getPhoneNumber());
+        userDto.setRole(userDto.getRole());
+        userDto.setRegisteredTime(today);
+        userDto.setUpdatedTime(today);
 
-        log.info("IN saveUser - new user with id: {} successfully added", user.getId());
+        log.info("IN saveUser - new user with id: {} successfully added", userDto.getId());
 
-        userRepo.save(user);
-        return user;
+        userRepository.save(UserMapper.INSTANCE.mapToEntity(userDto));
+        return userDto;
     }
 
     /**
@@ -75,15 +73,13 @@ public class UserServiceImpl implements UserService {
      * @return found user.
      */
     @Override
-    public User getById(Long id) throws EntityNotFoundException {
-        User user = userRepo.findUserById(id);
-        if (user == null) {
-            log.error("IN getById -  no user found by id {}", id);
-            throw new EntityNotFoundException("user not found");
-        }
-        log.info("IN getById - user: {} found by id: {}", user, id);
+    public UserDto getById(Long id) {
+        UserDto userDto = UserMapper.INSTANCE.mapToDto(userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user not found")));
 
-        return user;
+        log.info("IN getById - user: {} found by id: {}", userDto, id);
+
+        return userDto;
     }
 
     /**
@@ -92,9 +88,10 @@ public class UserServiceImpl implements UserService {
      * @return list of users.
      */
     @Override
-    public List<User> getAllUsers() {
-        List<User> users = userRepo.findAll();
+    public List<UserDto> getAll() {
+        List<UserDto> users = UserMapper.INSTANCE.mapToListDto(userRepository.findAll());
         log.info("IN getAllUsers - {} users found", users.size());
+
         return users;
     }
 
@@ -107,26 +104,18 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional()
-    public User updateUser(Long id, UserDto userDto) throws EntityNotFoundException {
-        LocalDateTime today = LocalDateTime.now();
+    public UserDto update(Long id, UserDto userDto) {
+        var today = LocalDateTime.now();
 
-        User dbUser = userRepo.findUserById(id);
-        if (dbUser == null) {
-            log.error("IN updateUser - user not found by id {}", id);
-            throw new EntityNotFoundException("user not found");
-        }
-        dbUser.setFirstName(userDto.getFirstName());
-        dbUser.setLastName(userDto.getLastName());
-        dbUser.setMail(userDto.getMail());
-        dbUser.setPassword(userDto.getPassword());
-        dbUser.setPhoneNumber(userDto.getPhoneNumber());
-        dbUser.setRole(userDto.getRole());
-        dbUser.setGender(userDto.getGender());
-        dbUser.setUpdatedTime(today);
+        var dbUser = userRepository.findById(id)
+                .orElseThrow(
+                        () -> new EntityNotFoundException("user not found"));
+
+        userDto.setId(id);
 
         log.info("IN updateUser - user with id: {} successfully edited ", id);
 
-        return userRepo.save(dbUser);
+        return UserMapper.INSTANCE.mapToDto(userRepository.save(UserMapper.INSTANCE.mapToEntity(userDto)));
     }
 
     /**
@@ -136,8 +125,8 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     @Transactional()
-    public void deleteUserById(Long id) {
-        userRepo.deleteUserById(id);
+    public void deleteById(Long id) {
+        userRepository.deleteById(id);
         log.info("IN deleteUserById - user with id: {} successfully deleted", id);
     }
 
@@ -148,14 +137,13 @@ public class UserServiceImpl implements UserService {
      * @return found user.
      */
     @Override
-    public Optional<User> findByMail(String mail) throws EntityNotFoundException {
-        Optional<User> user = userRepo.findByMail(mail);
-        if (!user.isPresent()) {
-            log.error("IN findByMail - user not found by mail: {}", mail);
-            throw new EntityNotFoundException("User doesn't exists");
-        }
+    public UserDto findByMail(String mail) throws EntityNotFoundException {
+
+        var mailUser = userRepository.findByMail(mail)
+                .orElseThrow(() -> new EntityNotFoundException("User doesn't exists"));
 
         log.info("IN findByMail - user found by mail: {}", mail);
-        return user;
+
+        return userMapper.mapToDto(mailUser);
     }
 }
