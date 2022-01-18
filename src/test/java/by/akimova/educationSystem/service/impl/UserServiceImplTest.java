@@ -1,19 +1,19 @@
 package by.akimova.educationSystem.service.impl;
 
-import by.akimova.educationSystem.model.Gender;
-import by.akimova.educationSystem.model.Role;
+import by.akimova.educationSystem.mappers.UserMapper;
 import by.akimova.educationSystem.model.User;
 import by.akimova.educationSystem.repository.UserRepository;
+import by.akimova.educationSystem.service.dto.UserDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -26,54 +26,29 @@ import static org.mockito.Mockito.*;
  * Copyright (c) 2022.
  ****************************************************************************************/
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
+    @Mock
+    private UserMapper userMapper;
 
     private UserServiceImpl userServiceImpl;
-    private User firstUser;
-    private User secondUser;
+    private UserDto firstUser;
+    private UserDto secondUser;
     private User userToSave;
-    private List<User> users;
+    private List<UserDto> users;
 
     @BeforeEach
     public void setUp() {
+        MockitoAnnotations.initMocks(this);
 
-        userServiceImpl = new UserServiceImpl(userRepository);
+        userServiceImpl = new UserServiceImpl(userRepository, userMapper);
 
-        var today = LocalDateTime.now();
+        firstUser = userMapper.mapToDto(UserTestUtils.createValidUser());
 
-        firstUser = new UserTestUtils()
-                .withFirstName("Alex")
-                .withLastName("Zxcvbn")
-                .withMail("asd@mail")
-                .withPhoneNumber("765432")
-                .withPassword("admin")
-                .withRole(Role.ADMIN)
-                .withGender(Gender.FEMALE)
-                .withRegisteredTime(today)
-                .withUpdatedTime(today)
-                .withBirthDate(today)
-                .build();
-
-        users.add(firstUser);
-
-        secondUser = new UserTestUtils()
-                .withFirstName("Qwerty")
-                .withLastName("Zxcvbn")
-                .withMail("zxcvb@maill")
-                .withPhoneNumber("765432")
-                .withPassword("admin")
-                .withRole(Role.ADMIN)
-                .withGender(Gender.FEMALE)
-                .withRegisteredTime(today)
-                .withUpdatedTime(today)
-                .withBirthDate(today)
-                .build();
-
-        users.add(secondUser);
+        users = userMapper.mapToListDto(UserTestUtils.createUserList());
 
         userToSave = new User();
         userToSave.setMail("asd@mail");
@@ -88,30 +63,36 @@ class UserServiceImplTest {
     }
 
     @Test
-    void save() {
+    void givenUserEntity_WhenSaveUser_ThenSaveAndObtainUser() {
     }
 
     @Test
-    void getById() {
+    void givenUserId_WhenFindUserById_ThenObtainUser() {
+        when(userRepository.findById(firstUser.getId()))
+                .thenReturn(Optional.of(userMapper.mapToEntity(firstUser)));
+        assertThat(userServiceImpl.getById((firstUser.getId()))).isEqualTo(firstUser);
     }
 
     @Test
-    void givenUserId_WhenGetCountOfWrote_ThenObtainNumberOfWrotePiece() {
-        when(userRepository.findAll()).thenReturn(users);
-        List<User> users1 = userServiceImpl.getAll();
+    void givenAllUsers_WhenGetCountOfUsers_ThenObtainNumberOfUsers() {
+        when(userMapper.mapToListDto(userRepository.findAll())).thenReturn(userMapper.mapToListDto(userMapper.mapDtoToEntityList(users)));
+        List<UserDto> users1 = userServiceImpl.getAll();
         assertEquals(users1, users);
         verify(userRepository, times(1)).findAll();
     }
 
     @Test
-    void updateUser() {
+    void givenUserEntity_WhenUpdateUser_ThenSaveAndObtainUser() {
     }
 
     @Test
-    void deleteUserById() {
+    void givenUserById_WhenDeleteUser_ThenDropUser() {
+        userServiceImpl.deleteById(firstUser.getId());
+        verify(userRepository, times(1)).deleteById(firstUser.getId());
+
     }
 
     @Test
-    void findByMail() {
+    void givenUserMail_WhenFindUserByMail_ThenObtainUser() {
     }
 }
