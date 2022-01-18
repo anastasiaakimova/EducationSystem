@@ -5,6 +5,8 @@ import by.akimova.educationSystem.model.Role;
 import by.akimova.educationSystem.model.User;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /*****************************************************************************************
  * @author Akimova Anastasia
@@ -15,72 +17,64 @@ import java.time.LocalDateTime;
 
 public class UserTestUtils {
 
-    private Long id;
-    private String firstName;
-    private String lastName;
-    private String mail;
-    private String password;
-    private Gender gender;
-    private String phoneNumber;
-    private Role role;
-    private LocalDateTime birthDate;
-    private LocalDateTime registeredTime;
-    private LocalDateTime updatedTime;
+    public static User createValidUser() {
+        var today = LocalDateTime.now();
 
-    public UserTestUtils withFirstName(String firstName) {
-        this.firstName = firstName;
-        return this;
-    }
+        var user = User.builder()
+                .id(8888L)
+                .firstName("Alex")
+                .lastName("Zxcvbn")
+                .birthDate(today)
+                .mail("asd@mail")
+                .phoneNumber("765432")
+                .password("admin")
+                .gender(Gender.FEMALE)
+                .role(Role.ADMIN)
+                .registeredTime(today)
+                .updatedTime(today)
+                .build();
 
-    public UserTestUtils withLastName(String lastName) {
-        this.lastName = lastName;
-        return this;
-    }
-
-    public UserTestUtils withMail(String mail) {
-        this.mail = mail;
-        return this;
-    }
-
-    public UserTestUtils withPassword(String password) {
-        this.password = password;
-        return this;
-    }
-
-    public UserTestUtils withGender(Gender gender) {
-        this.gender = gender;
-        return this;
-    }
-
-    public UserTestUtils withPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-        return this;
-    }
-
-    public UserTestUtils withRole(Role role) {
-        this.role = role;
-        return this;
-    }
-
-    public UserTestUtils withBirthDate(LocalDateTime birthDate) {
-        this.birthDate = birthDate;
-        return this;
-    }
-
-    public UserTestUtils withRegisteredTime(LocalDateTime registeredTime) {
-        this.registeredTime = registeredTime;
-        return this;
-    }
-
-    public UserTestUtils withUpdatedTime(LocalDateTime updatedTime) {
-        this.updatedTime = updatedTime;
-        return this;
-    }
-
-    public User build() {
-        User user = new User();
         return user;
     }
 
+    public static List<User> createUserList() {
 
+        var today = LocalDateTime.now();
+
+        List<User> users = new ArrayList<>();
+
+        var firstUser = User.builder()
+                .id(5L)
+                .firstName("Alex")
+                .lastName("Zxcvbn")
+                .birthDate(today)
+                .mail("asd@mail")
+                .phoneNumber("765432")
+                .password("admin")
+                .gender(Gender.FEMALE)
+                .role(Role.ADMIN)
+                .registeredTime(today)
+                .updatedTime(today)
+                .build();
+
+
+        var secondUser = User.builder()
+                .id(6L)
+                .firstName("Mary")
+                .lastName("Zxcvbn")
+                .birthDate(today)
+                .mail("arewqsd@mail")
+                .phoneNumber("7654364332")
+                .password("admin")
+                .gender(Gender.FEMALE)
+                .role(Role.ADMIN)
+                .registeredTime(today)
+                .updatedTime(today)
+                .build();
+
+        users.add(firstUser);
+        users.add(secondUser);
+
+        return users;
+    }
 }
