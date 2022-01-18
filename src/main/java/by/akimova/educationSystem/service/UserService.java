@@ -1,12 +1,9 @@
 package by.akimova.educationSystem.service;
 
-import by.akimova.educationSystem.exception.EntityNotFoundException;
-import by.akimova.educationSystem.exception.NotFreeUsernameException;
 import by.akimova.educationSystem.model.User;
 import by.akimova.educationSystem.service.dto.UserDto;
 
 import java.util.List;
-import java.util.Optional;
 
 /*****************************************************************************************
  * Service interface for class {@link User}.
@@ -18,15 +15,15 @@ import java.util.Optional;
  ****************************************************************************************/
 
 public interface UserService {
-    User save(UserDto userDto) throws NotFreeUsernameException;
+    UserDto save(UserDto userDto);
 
-    User getById(Long id) throws EntityNotFoundException;
+    UserDto getById(Long id);
 
-    List<User> getAllUsers();
+    List<UserDto> getAll();
 
-    User updateUser(Long id, UserDto user) throws EntityNotFoundException;
+    UserDto update(Long id, UserDto userDto);
 
-    void deleteUserById(Long id);
+    void deleteById(Long id);
 
-    Optional<User> findByMail(String mail) throws EntityNotFoundException;
+    UserDto findByMail(String mail);
 }
