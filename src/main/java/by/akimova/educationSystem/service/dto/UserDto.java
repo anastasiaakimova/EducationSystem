@@ -2,9 +2,10 @@ package by.akimova.educationSystem.service.dto;
 
 import by.akimova.educationSystem.model.Gender;
 import by.akimova.educationSystem.model.Role;
-//import io.swagger.annotations.ApiModel;
-//import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Builder;
 import lombok.Data;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
@@ -15,29 +16,31 @@ import java.time.LocalDateTime;
  * Copyright (c) 2022.
  ****************************************************************************************/
 @Data
-//@ApiModel(value = "UserModel", description = "Model who represents an user entity")
+@Builder
+@Component
+@Schema(description = "User entity")
 public class UserDto {
-
+    @Schema(required = true, accessMode = Schema.AccessMode.READ_ONLY)
     private Long id;
-  //  @ApiModelProperty(value = "User's first name", required = true)
+    @Schema(name = "firstName", description = "User's first name", required = true)
     private String firstName;
-  //  @ApiModelProperty(value = "User's last name", required = true)
+    @Schema(name = "lastName", description = "User's last name", required = true)
     private String lastName;
-  //  @ApiModelProperty(value = "User's email", required = true)
+    @Schema(name = "mail", description = "User's email", required = true)
     private String mail;
- //   @ApiModelProperty(value = "User's password", required = true)
+    @Schema(description = "User's password", required = true)
     private String password;
-   // @ApiModelProperty(value = "User's gender", required = true)
+    @Schema(description = "User's gender")
     private Gender gender;
-   // @ApiModelProperty(value = "User's phone number", required = true)
+    @Schema(description = "User's phone number")
     private String phoneNumber;
-   // @ApiModelProperty(value = "User's role", required = true)
+    @Schema(description = "User's role")
     private Role role;
-   // @ApiModelProperty(value = "User's date of birthday", required = true)
+    @Schema(description = "User's date of birthday")
     private LocalDateTime birthDate;
-   // @ApiModelProperty(value = "User's date of registration", required = true)
+    @Schema(description = "User's date of registration", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime registeredTime;
-  //  @ApiModelProperty(value = "User's date of last account update", required = true)
+    @Schema(description = "User's date of last account update", accessMode = Schema.AccessMode.READ_ONLY)
     private LocalDateTime updatedTime;
 
 }
