@@ -1,20 +1,22 @@
 package by.akimova.educationSystem.service.impl;
 
+import by.akimova.educationSystem.exception.EntityNotFoundException;
 import by.akimova.educationSystem.mappers.UserMapper;
 import by.akimova.educationSystem.model.User;
 import by.akimova.educationSystem.repository.UserRepository;
-import by.akimova.educationSystem.service.dto.UserDto;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /*****************************************************************************************
@@ -26,73 +28,109 @@ import static org.mockito.Mockito.*;
  * Copyright (c) 2022.
  ****************************************************************************************/
 
-//@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-    @Mock
-    private UserMapper userMapper;
-
+    private final UserMapper userMapper = Mappers.getMapper(UserMapper.class);
     private UserServiceImpl userServiceImpl;
-    private UserDto firstUser;
-    private UserDto secondUser;
-    private User userToSave;
-    private List<UserDto> users;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.initMocks(this);
 
         userServiceImpl = new UserServiceImpl(userRepository, userMapper);
 
-        firstUser = userMapper.mapToDto(UserTestUtils.createValidUser());
-
-        users = userMapper.mapToListDto(UserTestUtils.createUserList());
-
-        userToSave = new User();
-        userToSave.setMail("asd@mail");
-        userToSave.setPassword(("user"));
-
-    }
-
-    @AfterEach
-    public void tearDown() {
-        firstUser = secondUser = null;
-        users = null;
     }
 
     @Test
-    void givenUserEntity_WhenSaveUser_ThenSaveAndObtainUser() {
+    void givenUserEntity_WhenSaveUser_ThenObtainSaveUser() {
+        var createUserDto = UserTestUtils.createValidUserDto();
+        var userEntity = userMapper.createUserDtoMapToEntity(createUserDto);
+
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+        var savedUser = userServiceImpl.save((createUserDto));
+
+        assertThat(savedUser.getFirstName()).isEqualTo(userEntity.getFirstName());
     }
 
     @Test
     void givenUserId_WhenFindUserById_ThenObtainUser() {
-        when(userRepository.findById(firstUser.getId()))
-                .thenReturn(Optional.of(userMapper.mapToEntity(firstUser)));
-        assertThat(userServiceImpl.getById((firstUser.getId()))).isEqualTo(firstUser);
+        var userEntity = UserTestUtils.createValidUser();
+        when(userRepository.findById(anyLong()))
+                .thenReturn(Optional.of(userEntity));
+        var userDto = userServiceImpl.getById(1L);
+        assertThat(userEntity.getFirstName()).isEqualTo(userDto.getFirstName());
     }
+
+    // @Test
+    void givenUserId_WhenFindUserById_ThenObtainEntityNotFoundException() {
+        var userId = 1L;
+        when(userRepository.findById(userId)).thenReturn(null);
+        assertThatThrownBy(() -> userServiceImpl.getById(userId))
+                .isInstanceOf(EntityNotFoundException.class).hasMessage("user not found");
+    }
+
 
     @Test
     void givenAllUsers_WhenGetCountOfUsers_ThenObtainNumberOfUsers() {
-        when(userMapper.mapToListDto(userRepository.findAll())).thenReturn(userMapper.mapToListDto(userMapper.mapDtoToEntityList(users)));
-        List<UserDto> users1 = userServiceImpl.getAll();
-        assertEquals(users1, users);
+        var userList = UserTestUtils.createUserList();
+        when(userRepository.findAll())
+                .thenReturn(userList);
+
+        var usersDtoListFromDb = userServiceImpl.getAll();
+        var userListDto = userMapper.mapToListDto(userList);
+
+        assertEquals(usersDtoListFromDb, userListDto);
         verify(userRepository, times(1)).findAll();
     }
 
     @Test
-    void givenUserEntity_WhenUpdateUser_ThenSaveAndObtainUser() {
+    void givenUserEntity_WhenUpdateUser_ThenObtainUpdateUser() {
+        var updateUserDto = UserTestUtils.updateValidUserDto();
+        var userEntity = userMapper.updateUserDtoMapToEntity(updateUserDto);
+
+        when(userRepository.findById(userEntity.getId()))
+                .thenReturn(Optional.of(userEntity));
+        var userDto = userServiceImpl.getById((userEntity.getId()));
+
+        when(userRepository.save(any(User.class)))
+                .thenAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]);
+        var updatedUser = userServiceImpl.update(userEntity.getId(), updateUserDto);
+
+        assertThat(updatedUser.getId()).isEqualTo(userEntity.getId());
     }
 
     @Test
     void givenUserById_WhenDeleteUser_ThenDropUser() {
-        userServiceImpl.deleteById(firstUser.getId());
-        verify(userRepository, times(1)).deleteById(firstUser.getId());
+        var user = UserTestUtils.createValidUser();
+        userServiceImpl.deleteById(user.getId());
+        verify(userRepository, times(1))
+                .deleteById(user.getId());
 
     }
 
     @Test
     void givenUserMail_WhenFindUserByMail_ThenObtainUser() {
+        var user = UserTestUtils.createValidUser();
+
+        when(userRepository.findByMail(user.getMail()))
+                .thenReturn(java.util.Optional.of(user));
+
+        var userDto = userMapper.mapToDto(user);
+
+        assertThat(userServiceImpl.findByMail((user.getMail())))
+                .isEqualTo(userDto);
+    }
+
+    @Test
+    void givenUserMail_WhenFindUserByMail_ThenObtainEntityNotFoundException() {
+        String mail = "ghjnbv@mail";
+
+        when(userRepository.findByMail(mail)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userServiceImpl.findByMail(mail))
+                .isInstanceOf(EntityNotFoundException.class).hasMessage("User doesn't exists");
     }
 }
