@@ -1,6 +1,8 @@
 package by.akimova.educationSystem.controller;
 
 import by.akimova.educationSystem.service.UserService;
+import by.akimova.educationSystem.service.dto.CreateUserDto;
+import by.akimova.educationSystem.service.dto.UpdateUserDto;
 import by.akimova.educationSystem.service.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,7 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Slf4j
 @Tag(name = "User", description = "REST controller user connected requests")
 public class UserController {
@@ -37,12 +39,11 @@ public class UserController {
     /**
      * The method add new user.
      *
-     * @param userDto This is dto with all information and body.
+     * @param createUserDto This is dto with all information and body.
      * @return response with body of created user and status ok.
      */
 
-
-    @PostMapping("")
+    @PostMapping
     @Operation(
             summary = "Create user",
             description = "Create user based on DTO object",
@@ -53,9 +54,8 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Something went wrong", content = @Content)
             })
-
-    public ResponseEntity<UserDto> create(@RequestBody UserDto userDto) {
-        UserDto savedUser = userService.save(userDto);
+    public ResponseEntity<UserDto> create(@RequestBody CreateUserDto createUserDto) {
+        var savedUser = userService.save(createUserDto);
         return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
     }
 
@@ -64,7 +64,7 @@ public class UserController {
      *
      * @return ResponseEntity with list of users and status ok.
      */
-    @GetMapping
+
     @Operation(
             summary = "Get list of users",
             description = "Get list of users",
@@ -74,6 +74,7 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Something went wrong", content = @Content)
             })
+    @GetMapping
     public ResponseEntity<List<UserDto>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
@@ -98,10 +99,8 @@ public class UserController {
             })
     public ResponseEntity<?> getById(@PathVariable(value = "id")
                                      @Parameter(description = "user's id",
-                                             schema = @Schema(
-                                                     type = "Long"))
-                                             Long id) {
-        UserDto userDto = userService.getById(id);
+                                             schema = @Schema()) Long id) {
+        var userDto = userService.getById(id);
         return new ResponseEntity<>(userDto, HttpStatus.OK);
     }
 
@@ -122,19 +121,19 @@ public class UserController {
                     @ApiResponse(responseCode = "400", description = "Bad request", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Something went wrong", content = @Content)
             })
-    ResponseEntity<?> getByMail(@PathVariable(value = "mail")
-                                @Parameter(description = "user's mail",
-                                        schema = @Schema(
-                                                type = "String")) String mail) {
-        UserDto userDto = userService.findByMail(mail);
+    public ResponseEntity<?> getByMail(@PathVariable(value = "mail")
+                                       @Parameter(description = "user's mail",
+                                               schema = @Schema(type = "String"))
+                                               String mail) {
+        var userDto = userService.findByMail(mail);
         return ResponseEntity.ok(userDto);
     }
 
     /**
      * The method update item.
      *
-     * @param id      This is user's id which should be updated.
-     * @param userDto This is new body for user which should be updated.
+     * @param id            This is user's id which should be updated.
+     * @param updateUserDto This is new body for user which should be updated.
      * @return response with body of updated user and status ok.
      */
     @PutMapping("/{id}")
@@ -149,12 +148,11 @@ public class UserController {
                     @ApiResponse(responseCode = "500", description = "Something went wrong", content = @Content)
             })
     public ResponseEntity<?> update(@PathVariable(value = "id")
-                                    @Parameter(description = "user's id",
-                                            schema = @Schema(
-                                                    type = "Long"))
+                                    @Parameter(description = "user's id", schema = @Schema(
+                                            type = "Long"))
                                             Long id,
-                                    @RequestBody UserDto userDto) {
-        var updatedUser = userService.update(id, userDto);
+                                    @RequestBody UpdateUserDto updateUserDto) {
+        var updatedUser = userService.update(id, updateUserDto);
         return new ResponseEntity<>(updatedUser, HttpStatus.OK);
     }
 
