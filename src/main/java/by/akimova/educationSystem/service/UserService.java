@@ -1,7 +1,10 @@
 package by.akimova.educationSystem.service;
 
 import by.akimova.educationSystem.model.User;
+import by.akimova.educationSystem.service.dto.CreateUserDto;
+import by.akimova.educationSystem.service.dto.UpdateUserDto;
 import by.akimova.educationSystem.service.dto.UserDto;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -13,15 +16,15 @@ import java.util.List;
  *
  * Copyright (c) 2022.
  ****************************************************************************************/
-
+@Component
 public interface UserService {
-    UserDto save(UserDto userDto);
+    UserDto save(CreateUserDto createUserDto);
 
     UserDto getById(Long id);
 
     List<UserDto> getAll();
 
-    UserDto update(Long id, UserDto userDto);
+    UserDto update(Long id, UpdateUserDto updateUserDto);
 
     void deleteById(Long id);
 
