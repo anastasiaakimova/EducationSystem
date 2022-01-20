@@ -3,6 +3,9 @@ package by.akimova.educationSystem.service.impl;
 import by.akimova.educationSystem.model.Gender;
 import by.akimova.educationSystem.model.Role;
 import by.akimova.educationSystem.model.User;
+import by.akimova.educationSystem.service.dto.CreateUserDto;
+import by.akimova.educationSystem.service.dto.UpdateUserDto;
+import by.akimova.educationSystem.service.dto.UserDto;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -25,7 +28,7 @@ public class UserTestUtils {
                 .firstName("Alex")
                 .lastName("Zxcvbn")
                 .birthDate(today)
-                .mail("asd@mail")
+                .mail("as45-0987656d@mail")
                 .phoneNumber("765432")
                 .password("admin")
                 .gender(Gender.FEMALE)
@@ -37,6 +40,54 @@ public class UserTestUtils {
         return user;
     }
 
+    public static CreateUserDto createValidUserDto() {
+        var today = LocalDateTime.now();
+
+        var createUserDto = CreateUserDto.builder()
+                .firstName("Alex1")
+                .lastName("Zxcvbn1")
+                .birthDate(today)
+                .mail("as3415d@mail")
+                .phoneNumber("7651432")
+                .password("admin1")
+                .gender(Gender.FEMALE)
+                .build();
+
+        return createUserDto;
+    }
+
+    public static UpdateUserDto updateValidUserDto() {
+        var today = LocalDateTime.now();
+
+        var updateUserDto = UpdateUserDto.builder()
+                .firstName("Alex1")
+                .lastName("Zxcvbn1")
+                .birthDate(today)
+                .phoneNumber("7651432")
+                .gender(Gender.FEMALE)
+                .build();
+
+        return updateUserDto;
+    }
+
+    public static UserDto validUserDto() {
+        var today = LocalDateTime.now();
+
+        var createUserDto = UserDto.builder()
+                .id(88L)
+                .firstName("Alex1")
+                .lastName("Zxcvbn1")
+                .birthDate(today)
+                .mail("as3415d@mail")
+                .phoneNumber("7651432")
+                .password("admin1")
+                .role(Role.ADMIN)
+                .gender(Gender.FEMALE)
+                .build();
+
+        return createUserDto;
+    }
+
     public static List<User> createUserList() {
 
         var today = LocalDateTime.now();
@@ -45,12 +96,12 @@ public class UserTestUtils {
 
         var firstUser = User.builder()
                 .id(5L)
-                .firstName("Alex")
-                .lastName("Zxcvbn")
+                .firstName("Alex1")
+                .lastName("Zxcvbn1")
                 .birthDate(today)
-                .mail("asd@mail")
-                .phoneNumber("765432")
-                .password("admin")
+                .mail("asd1@mail")
+                .phoneNumber("7615432")
+                .password("admin1")
                 .gender(Gender.FEMALE)
                 .role(Role.ADMIN)
                 .registeredTime(today)
@@ -59,6 +110,49 @@ public class UserTestUtils {
 
 
         var secondUser = User.builder()
+                .id(6L)
+                .firstName("Mary")
+                .lastName("Zxcvbn")
+                .birthDate(today)
+                .mail("arewqsd@mail")
+                .phoneNumber("7654364332")
+                .password("admin")
+                .gender(Gender.FEMALE)
+                .role(Role.ADMIN)
+                .registeredTime(today)
+                .updatedTime(today)
+                .build();
+
+        users.add(firstUser);
+        users.add(secondUser);
+
+        return users;
+    }
+
+
+
+    public static List<UserDto> createUserDtoList() {
+
+        var today = LocalDateTime.now();
+
+        List<UserDto> users = new ArrayList<>();
+
+        var firstUser = UserDto.builder()
+                .id(5L)
+                .firstName("Alex1")
+                .lastName("Zxcvbn1")
+                .birthDate(today)
+                .mail("asd1@mail")
+                .phoneNumber("7615432")
+                .password("admin1")
+                .gender(Gender.FEMALE)
+                .role(Role.ADMIN)
+                .registeredTime(today)
+                .updatedTime(today)
+                .build();
+
+
+        var secondUser = UserDto.builder()
                 .id(6L)
                 .firstName("Mary")
                 .lastName("Zxcvbn")
