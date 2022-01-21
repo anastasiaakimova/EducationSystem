@@ -28,4 +28,10 @@ logging:
     org.apache: WARN
     org.hibernate: WARN
 
+jwt:
+  header: Authorization
+  secret: key
+  expiration: 604800
+
+
 
