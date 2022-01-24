@@ -3,11 +3,15 @@ package by.akimova.educationSystem.service.impl;
 import by.akimova.educationSystem.exception.EntityNotFoundException;
 import by.akimova.educationSystem.exception.NotFreeUsernameException;
 import by.akimova.educationSystem.mappers.UserMapper;
+import by.akimova.educationSystem.model.Role;
 import by.akimova.educationSystem.repository.UserRepository;
 import by.akimova.educationSystem.service.UserService;
+import by.akimova.educationSystem.service.dto.CreateUserDto;
+import by.akimova.educationSystem.service.dto.UpdateUserDto;
 import by.akimova.educationSystem.service.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,39 +35,31 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
     private final UserMapper userMapper;
-
+    private final BCryptPasswordEncoder passwordEncoder;
 
     /**
      * The method add new user.
      *
-     * @param userDto This is user with information about it, and it's fields
+     * @param createUserDto This is user with information about it, and it's fields
      * @return Saved user.
      */
+    @Override
     @Transactional()
-    public UserDto save(UserDto userDto) throws NotFreeUsernameException {
+    public UserDto save(CreateUserDto createUserDto) {
+
         var today = LocalDateTime.now();
+        var userEntity = userMapper.createUserDtoMapToEntity(createUserDto);
 
-        var mailUser = userRepository.findByMail(userDto.getMail())
-                .orElseThrow(
-                        () -> new NotFreeUsernameException("This username is already taken"));
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+        userEntity.setRole(Role.USER);
+        userEntity.setRegisteredTime(today);
+        userEntity.setUpdatedTime(today);
 
-        userDto.setFirstName(userDto.getFirstName());
-        userDto.setLastName(userDto.getLastName());
-        userDto.setMail(userDto.getMail());
-        userDto.setBirthDate(userDto.getBirthDate());
-        userDto.setPassword(userDto.getPassword());
-        userDto.setGender(userDto.getGender());
-        userDto.setPhoneNumber(userDto.getPhoneNumber());
-        userDto.setRole(userDto.getRole());
-        userDto.setRegisteredTime(today);
-        userDto.setUpdatedTime(today);
+        userRepository.save(userEntity);
+        log.info("IN saveUser - new user with id: {} successfully added", userEntity.getId());
 
-        log.info("IN saveUser - new user with id: {} successfully added", userDto.getId());
-
-        userRepository.save(UserMapper.INSTANCE.mapToEntity(userDto));
-        return userDto;
+        return userMapper.mapToDto(userEntity);
     }
 
     /**
@@ -74,9 +70,9 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserDto getById(Long id) {
-        UserDto userDto = UserMapper.INSTANCE.mapToDto(userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("user not found")));
-
+        var userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("user not found"));
+        var userDto = userMapper.mapToDto(userEntity);
         log.info("IN getById - user: {} found by id: {}", userDto, id);
 
         return userDto;
@@ -89,7 +85,7 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public List<UserDto> getAll() {
-        List<UserDto> users = UserMapper.INSTANCE.mapToListDto(userRepository.findAll());
+        List<UserDto> users = userMapper.mapToListDto(userRepository.findAll());
         log.info("IN getAllUsers - {} users found", users.size());
 
         return users;
@@ -99,23 +95,28 @@ public class UserServiceImpl implements UserService {
      * This method update user.
      *
      * @param id      This is user's id which needed to update.
-     * @param userDto This is updated user.
+     * @param updateUserDto This is updated user.
      * @return Updated user.
      */
     @Override
     @Transactional()
-    public UserDto update(Long id, UserDto userDto) {
+    public UserDto update(Long id, UpdateUserDto updateUserDto) {
+
         var today = LocalDateTime.now();
-
         var dbUser = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new EntityNotFoundException("user not found"));
+                .orElseThrow(() -> new EntityNotFoundException("user not found"));
 
-        userDto.setId(id);
+        dbUser.setFirstName(updateUserDto.getFirstName());
+        dbUser.setLastName(updateUserDto.getLastName());
+        dbUser.setPhoneNumber(updateUserDto.getPhoneNumber());
+        dbUser.setGender(updateUserDto.getGender());
+        dbUser.setBirthDate(updateUserDto.getBirthDate());
+        dbUser.setUpdatedTime(today);
 
+        userRepository.save(dbUser);
         log.info("IN updateUser - user with id: {} successfully edited ", id);
 
-        return UserMapper.INSTANCE.mapToDto(userRepository.save(UserMapper.INSTANCE.mapToEntity(userDto)));
+        return userMapper.mapToDto(dbUser);
     }
 
     /**
@@ -141,9 +142,9 @@ public class UserServiceImpl implements UserService {
 
         var mailUser = userRepository.findByMail(mail)
                 .orElseThrow(() -> new EntityNotFoundException("User doesn't exists"));
-
         log.info("IN findByMail - user found by mail: {}", mail);
+        var userDto = userMapper.mapToDto(mailUser);
 
-        return userMapper.mapToDto(mailUser);
+        return userDto;
     }
 }
