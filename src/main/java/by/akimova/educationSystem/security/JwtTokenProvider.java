@@ -29,10 +29,6 @@ public class JwtTokenProvider {
 
     private final UserDetailsService userDetailsService;
 
-    public JwtTokenProvider(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
-
     @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.header}")
@@ -40,13 +36,16 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration}")
     private long validityInNMilliseconds;
 
+    public JwtTokenProvider(@Qualifier("userDetailsServiceImpl") UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
+
     @PostConstruct
     protected void init() {
         secretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
     }
 
     public String createToken(String username, String role) {
-
         var claims = Jwts.claims().setSubject(username);
         claims.put("role", role);
         var now = new Date();
