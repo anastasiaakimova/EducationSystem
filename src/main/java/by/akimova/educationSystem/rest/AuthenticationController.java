@@ -2,7 +2,7 @@ package by.akimova.educationSystem.rest;
 
 import by.akimova.educationSystem.repository.UserRepository;
 import by.akimova.educationSystem.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,23 +29,19 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @Autowired
-    public AuthenticationController(AuthenticationManager authenticationManager,
-                                    UserRepository userRepository,
-                                    JwtTokenProvider jwtTokenProvider) {
-        this.authenticationManager = authenticationManager;
-        this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-
-    }
-
-
+    /**
+     * This method for authentication login request.
+     *
+     * @param request request's parameters.
+     * @return ResponseEntity with mail and token.
+     */
     @PostMapping("/login")
     public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDto request) {
         try {
